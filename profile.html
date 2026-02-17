@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Canteen Preorder</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-header {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid transparent;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+
+        .order-card:hover {
+            transform: translateX(5px);
+        }
+
+        .order-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .order-nav button {
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .order-nav button.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar animate-fade-in">
+        <div class="brand">Canteen Preorder</div>
+        <div class="nav-links">
+            <a href="student.html">Menu</a>
+            <a href="profile.html" class="active">My Orders</a>
+            <a href="#" onclick="App.logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container animate-fade-in" style="max-width: 800px; margin: 0 auto; padding: 0 20px;">
+
+        <div class="profile-header">
+            <div class="avatar" id="avatar">U</div>
+            <h2 id="user-name">User</h2>
+            <p style="color: #666;">Student</p>
+        </div>
+
+        <h3 class="mb-4">Order History</h3>
+
+        <div id="orders-list">
+            <!-- Orders injected here -->
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        App.requireAuth("student");
+
+        const user = App.getUser();
+        document.getElementById("user-name").innerText = user;
+        document.getElementById("avatar").innerText = user.charAt(0).toUpperCase();
+
+        function loadOrders() {
+            let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+            // Filter for current user and reverse to show newest first
+            let myOrders = orders.filter(o => o.user === user).reverse();
+
+            const container = document.getElementById("orders-list");
+
+            if (myOrders.length === 0) {
+                container.innerHTML = '<p class="text-center" style="color: #666;">No orders found. Time to eat! 🍔</p>';
+                return;
+            }
+
+            container.innerHTML = "";
+            myOrders.forEach(o => {
+                // Determine border color based on status
+                let borderColor = "#ccc";
+                if (o.status === "Paid") borderColor = "#3498db";
+                if (o.status === "Preparing") borderColor = "#e67e22";
+                if (o.status === "Ready") borderColor = "#2ecc71";
+                if (o.status === "Completed") borderColor = "#95a5a6";
+
+                container.innerHTML += `
+                    <div class="order-card" style="border-left-color: ${borderColor};">
+                        <div class="flex justify-between items-center mb-2">
+                            <strong>#${o.id}</strong>
+                            <span class="badge status-${o.status.replace(' ', '-')}">${o.status}</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">
+                            ${o.items.map(i => i.name).join(", ")}
+                        </div>
+                        <div class="flex justify-between items-center" style="font-size: 0.85rem; color: #888;">
+                            <span>📅 ${o.timestamp || "Just now"}</span>
+                            <span style="font-size: 1rem; color: var(--dark); font-weight: bold;">₹${o.total}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        loadOrders();
+        // Auto refresh
+        setInterval(loadOrders, 5000);
+
+    </script>
+</body>
+
+</html>

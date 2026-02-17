@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Canteen Preorder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="flex items-center justify-between" style="justify-content: center;">
+
+    <div class="glass-card animate-fade-in" style="width: 350px; text-align: center;">
+        <h1 class="brand mb-4">Canteen<br>Preorder</h1>
+        <h3 class="mb-4" style="color: #666; font-weight: 400;">Welcome Back!</h3>
+
+        <input id="name" type="text" placeholder="Enter your name" autofocus>
+
+        <select id="role">
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <button onclick="handleLogin()" class="btn btn-primary w-100">Get Started</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        function handleLogin() {
+            const name = document.getElementById("name").value.trim();
+            const role = document.getElementById("role").value;
+            App.login(name, role);
+        }
+
+        // Enter key to login
+        document.getElementById("name").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") handleLogin();
+        });
+    </script>
+</body>
+
+</html>

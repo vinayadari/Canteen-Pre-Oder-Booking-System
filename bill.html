@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Canteen Preorder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="flex items-center justify-between" style="justify-content: center;">
+
+    <div class="glass-card animate-fade-in text-center" style="width: 400px;">
+        <h2 class="mb-2">Scan to Pay</h2>
+        <p class="mb-4 text-center" style="color: #666;">Please scan the QR code to complete your order.</p>
+
+        <div id="bill-details" class="mb-4"
+            style="text-align: left; background: rgba(255,255,255,0.5); padding: 15px; border-radius: 10px;">
+            <!-- Details injected -->
+        </div>
+
+        <div class="mb-4" style="background: white; padding: 10px; display: inline-block; border-radius: 10px;">
+            <img id="qr" width="200" alt="QR Code">
+        </div>
+
+        <button onclick="pay()" class="btn btn-primary w-100">Confirm Payment</button>
+        <button onclick="history.back()" class="btn btn-secondary w-100" style="margin-top: 10px;">Cancel</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if (!localStorage.currentBill) {
+            alert("No current bill found.");
+            location.href = "student.html";
+        }
+
+        let order = JSON.parse(localStorage.currentBill);
+        let upi = "canteen" + Math.floor(Math.random() * 9999) + "@upi";
+        let upiURL = `upi://pay?pa=${upi}&pn=Canteen&am=${order.total}&cu=INR`;
+
+        document.getElementById("qr").src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(upiURL);
+
+        document.getElementById("bill-details").innerHTML = `
+            <div class="flex justify-between mb-1">
+                <span>Order ID:</span> <strong>${order.id}</strong>
+            </div>
+            <div class="flex justify-between mb-1">
+                <span>Items:</span> <strong>${order.items.length}</strong>
+            </div>
+            <div class="flex justify-between mb-1">
+                <span>Total Amount:</span> <strong style="color: var(--primary); font-size: 1.2rem;">₹${order.total}</strong>
+            </div>
+            <div class="flex justify-between">
+                <span>Slot:</span> <strong>${order.slot}</strong>
+            </div>
+        `;
+
+        function pay() {
+            let orders = JSON.parse(localStorage.orders || "[]");
+            order.status = "Paid";
+            order.timestamp = new Date().toLocaleString(); // Ensure timestamp is set
+            orders.push(order);
+            localStorage.orders = JSON.stringify(orders);
+            // Don't clear currentBill yet, needed for thankyou page
+            location.href = "thankyou.html";
+        }
+    </script>
+</body>
+
+</html>
