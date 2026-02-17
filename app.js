@@ -16,16 +16,16 @@ const App = {
     logout: () => {
         localStorage.removeItem("user");
         localStorage.removeItem("role");
-        location.href = "login.html";
+        location.href = "index.html";
     },
 
     requireAuth: (role = null) => {
         const user = App.getUser();
         const currentRole = App.getRole();
-        if (!user) location.href = "login.html";
+        if (!user) location.href = "index.html";
         if (role && currentRole !== role) {
             alert("Unauthorized access!");
-            location.href = "login.html";
+            location.href = "index.html";
         }
     },
 
